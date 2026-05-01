@@ -14,6 +14,8 @@ app.config['SECRET_KEY'] = 'secret'
 
 db = SQLAlchemy(app)
 with app.app_context():
+    db.create_all()
+with app.app_context():
     try:
         db.create_all()
     except Exception as e:
