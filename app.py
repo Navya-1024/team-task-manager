@@ -13,13 +13,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SECRET_KEY'] = 'secret'
 
 db = SQLAlchemy(app)
-with app.app_context():
-    db.create_all()
-with app.app_context():
-    try:
-        db.create_all()
-    except Exception as e:
-        print("DB error:", e)
+
+
 # ---------------- DATABASE ----------------
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
