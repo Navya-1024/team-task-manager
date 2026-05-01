@@ -1,19 +1,14 @@
 from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
-
-app = Flask(__name__)
 import os
 
-if not os.path.exists("database.db"):
-    open("database.db", "w").close()
-users = []
-projects = []
-tasks = []
+app = Flask(__name__)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///database.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'secret'
 
 db = SQLAlchemy(app)
-
 
 # ---------------- DATABASE ----------------
 class User(db.Model):
@@ -22,13 +17,13 @@ class User(db.Model):
     password = db.Column(db.String(100))
     role = db.Column(db.String(20))
 
-    # -------- PROJECT TABLE --------
+
 class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     created_by = db.Column(db.Integer)
 
-# -------- TASK TABLE --------
+
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100))
@@ -36,18 +31,27 @@ class Task(db.Model):
     assigned_to = db.Column(db.Integer)
     project_id = db.Column(db.Integer)
 
+# ✅ CREATE TABLES AFTER MODELS
+with app.app_context():
+    db.create_all()
+
 # ---------------- ROUTES ----------------
 
 @app.route('/')
 def home():
     return redirect('/login')
 
+# ✅ FIXED SIGNUP
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         role = request.form.get('role', 'User')
+
+        existing = User.query.filter_by(username=username).first()
+        if existing:
+            return "User already exists"
 
         new_user = User(username=username, password=password, role=role)
         db.session.add(new_user)
@@ -57,6 +61,7 @@ def signup():
 
     return render_template('signup.html')
 
+# ✅ LOGIN
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -130,8 +135,7 @@ def complete_task(id):
 
     return redirect('/dashboard')
 
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
 
+if __name__ == '__main__':
     app.run(debug=True)
+      
