@@ -1,18 +1,23 @@
 from flask import Flask, render_template, request, redirect
-#from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+import os
+
+if not os.path.exists("database.db"):
+    open("database.db", "w").close()
 users = []
 projects = []
 tasks = []
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SECRET_KEY'] = 'secret'
 
-#db = SQLAlchemy(app)
-@app.before_first_request
+db = SQLAlchemy(app)
 with app.app_context():
-    db.create_all()
-
+    try:
+        db.create_all()
+    except Exception as e:
+        print("DB error:", e)
 # ---------------- DATABASE ----------------
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
