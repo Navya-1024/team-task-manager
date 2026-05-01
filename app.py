@@ -6,7 +6,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SECRET_KEY'] = 'secret'
 
 db = SQLAlchemy(app)
-
+@app.before_request
 with app.app_context():
     db.create_all()
 
