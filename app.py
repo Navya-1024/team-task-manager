@@ -1,11 +1,14 @@
 from flask import Flask, render_template, request, redirect
-from flask_sqlalchemy import SQLAlchemy
+#from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+users = []
+projects = []
+tasks = []
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SECRET_KEY'] = 'secret'
 
-db = SQLAlchemy(app)
+#db = SQLAlchemy(app)
 @app.before_first_request
 with app.app_context():
     db.create_all()
@@ -40,32 +43,14 @@ def home():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        role = request.form['role']
-
-        user = User(username=username, password=password, role=role)
-        db.session.add(user)
-        db.session.commit()
-
         return redirect('/login')
-
     return render_template('signup.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-
-        user = User.query.filter_by(username=username, password=password).first()
-
-        if user:
-            return redirect('/dashboard')
-        else:
-            return "Invalid credentials"
-
+        return redirect('/dashboard')
     return render_template('login.html')
 
 @app.route('/dashboard')
