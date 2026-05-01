@@ -9,7 +9,7 @@ if not os.path.exists("database.db"):
 users = []
 projects = []
 tasks = []
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///database.db')
 app.config['SECRET_KEY'] = 'secret'
 
 db = SQLAlchemy(app)
@@ -45,9 +45,17 @@ def home():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        return redirect('/login')
-    return render_template('signup.html')
+        username = request.form['username']
+        password = request.form['password']
+        role = request.form.get('role', 'User')
 
+        new_user = User(username=username, password=password, role=role)
+        db.session.add(new_user)
+        db.session.commit()
+
+        return redirect('/login')
+
+    return render_template('signup.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
