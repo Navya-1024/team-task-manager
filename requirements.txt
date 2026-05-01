@@ -1,0 +1,4 @@
+flask
+flask_sqlchemy
+flask_login
+gunicorn
