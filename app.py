@@ -55,7 +55,16 @@ def signup():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        return redirect('/dashboard')
+        username = request.form['username']
+        password = request.form['password']
+
+        user = User.query.filter_by(username=username).first()
+
+        if user and user.password == password:
+            return redirect('/dashboard')
+        else:
+            return "Invalid username or password"
+
     return render_template('login.html')
 
 @app.route('/dashboard')
